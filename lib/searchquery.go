@@ -66,7 +66,20 @@ type QueryEmbed struct {
 	Qs            *QueryString           `json:"query_string,omitempty"`
 	MultiMatch    *MultiMatch            `json:"multi_match,omitempty"`
 	FunctionScore map[string]interface{} `json:"function_score,omitempty"`
+	Bool          map[string][]*QueryDsl `json:"bool,omitempty"`
 	//Exist    string            `json:"_exists_,omitempty"`
+}
+
+// Should can add QueryDsl with initializing `"bool":{"should":[]}`
+func (qd *QueryDsl) Should(qds ...*QueryDsl) *QueryDsl {
+	if qd.Bool == nil {
+		qd.Bool = map[string][]*QueryDsl{}
+	}
+	if _, ok := qd.Bool["should"]; !ok {
+		qd.Bool["should"] = []*QueryDsl{}
+	}
+	qd.Bool["should"] = append(qd.Bool["should"], qds...)
+	return qd
 }
 
 // MarshalJSON provides custom marshalling to support the query dsl which is a conditional
